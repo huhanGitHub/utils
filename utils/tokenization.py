@@ -24,7 +24,7 @@ import unicodedata
 import six
 import tensorflow as tf
 
-max_length =64
+max_length =50
 
 def convert_to_unicode(text):
   """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
@@ -61,7 +61,7 @@ def load_vocab(vocab_file):
   return vocab
 
 
-def convert_by_vocab(vocab, items):
+def convert_by_vocab_tokens2ids(vocab, items):
   """Converts a sequence of [tokens|ids] using the vocab."""
   output = []
   for item in items:
@@ -73,17 +73,34 @@ def convert_by_vocab(vocab, items):
         output.append(vocab[item])
     if len(output) == max_length:
       return output
+
+  while len(output) < max_length:
+    output.append(0)
   return output
 
+
+def convert_by_vocab_ids2tokens(vocab, items):
+  """Converts a sequence of [tokens|ids] using the vocab."""
+  output = []
+  for item in items:
+    check = vocab.get(item, -1)
+    if check == -1:
+      # vocab.setdefault(item, len(vocab))
+      output.append('[UNK]')
+    else:
+      output.append(vocab[item])
+    if len(output) == max_length:
+      return output
+  return output
 
 def convert_tokens_to_ids(vocab, tokens):
   tokens.insert(0, '[CLS]')
   tokens.append('[SEP]')
-  return convert_by_vocab(vocab, tokens)
+  return convert_by_vocab_tokens2ids(vocab, tokens)
 
 
 def convert_ids_to_tokens(inv_vocab, ids):
-  return convert_by_vocab(inv_vocab, ids)
+  return convert_by_vocab_ids2tokens(inv_vocab, ids)
 
 
 def whitespace_tokenize(text):
@@ -113,10 +130,10 @@ class FullTokenizer(object):
     return split_tokens
 
   def convert_tokens_to_ids(self, tokens):
-    return convert_by_vocab(self.vocab, tokens)
+    return convert_by_vocab_tokens2ids(self.vocab, tokens)
 
   def convert_ids_to_tokens(self, ids):
-    return convert_by_vocab(self.inv_vocab, ids)
+    return convert_by_vocab_ids2tokens(self.inv_vocab, ids)
 
 
 class BasicTokenizer(object):

@@ -14,7 +14,7 @@ def buildDicFromVocab(path):
     except IOError:
         print(path+"not found")
 
-def str2id(vocab, path):
+def load_data2id(vocab, path):
     try:
         f = open(path, encoding='UTF-8')
         output = []
@@ -36,7 +36,7 @@ surpose delimiter is '|'
 [[a b c][A B C]]
 [[aa bb cc][AA BB CC]]
 """
-def str2id_delimiter(vocab, path, delimiter):
+def load_data2id_delimiter(vocab, path, delimiter):
     try:
         f = open(path, encoding='UTF-8')
         output = []
